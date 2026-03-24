@@ -75,6 +75,13 @@ jobs:
       contents: read
       packages: read
     steps:
+      - name: Log in to ghcr.io
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Install slsa-verifier
         run: go install github.com/slsa-framework/slsa-verifier/v2/cli/slsa-verifier@v2.7.1
 
@@ -92,6 +99,16 @@ jobs:
       contents: read
       packages: read
     steps:
+      - name: Log in to ghcr.io
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull image
+        run: docker pull "${{ needs.build.outputs.image }}@${{ needs.build.outputs.digest }}"
+
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         with:
