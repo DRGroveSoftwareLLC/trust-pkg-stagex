@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    "docker:pinDigests"
+  ],
+  "pinDigests": true,
+  "packageRules": [
+    {
+      "description": "Pin Docker digests in Containerfile",
+      "matchDatasources": ["docker"],
+      "pinDigests": true
+    },
+    {
+      "description": "Pin GitHub Action digests and keep comment tags updated",
+      "matchDatasources": ["github-tags"],
+      "matchManagers": ["github-actions"],
+      "pinDigests": true
+    },
+    {
+      "description": "Group all stagex base image updates together",
+      "matchDatasources": ["docker"],
+      "matchPackagePrefixes": ["stagex/"],
+      "groupName": "stagex base images"
+    },
+    {
+      "description": "Group all Docker action updates together",
+      "matchDatasources": ["github-tags"],
+      "matchPackagePrefixes": ["docker/"],
+      "groupName": "docker actions"
+    },
+    {
+      "description": "Track cert-manager/trust-manager git clone tag",
+      "matchDatasources": ["github-tags"],
+      "matchPackageNames": ["cert-manager/trust-manager"],
+      "pinDigests": true
+    }
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Track trust-manager git clone version and SHA in Containerfile",
+      "fileMatch": ["^Containerfile$"],
+      "matchStrings": [
+        "git clone --depth=1 --branch (?<currentValue>v[\\d.]+) https://github.com/(?<depName>cert-manager/trust-manager)"
+      ],
+      "datasourceTemplate": "github-tags"
+    },
+    {
+      "customType": "regex",
+      "description": "Track slsa-verifier version in workflows",
+      "fileMatch": ["\\.github/workflows/.+\\.yml$"],
+      "matchStrings": [
+        "slsa-verifier@(?<currentValue>v[\\d.]+)"
+      ],
+      "depNameTemplate": "slsa-framework/slsa-verifier",
+      "datasourceTemplate": "github-tags"
+    }
+  ]
+}
