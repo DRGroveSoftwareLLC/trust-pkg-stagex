@@ -27,10 +27,11 @@ ENV GOOS=linux
 ENV GOARCH=amd64
 ENV GOPATH=/cache/go
 ENV GOCACHE=/cache/go-cache
+ENV TRUST_MANAGER_DIGEST=5dbfc12bb5af40089428f3fb5046ea727ea64048
 
 # Pin to v0.22.0 by tag + verify commit SHA for reproducibility
 RUN git clone --depth=1 --branch v0.22.0 https://github.com/cert-manager/trust-manager /src && \
-    cd /src && test "$(git rev-parse HEAD)" = "0e3c363df1a9af8f913dfd61c6084544cc250d78"
+    cd /src && test "$(git rev-parse HEAD)" = "${TRUST_MANAGER_DIGEST}"
 
 WORKDIR /src/trust-packages/debian
 RUN go build -trimpath -ldflags="-buildid=" -o /stagex-bundle-static .
